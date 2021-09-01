@@ -11,6 +11,9 @@
 // constructor WITHOUT memory allocation
 ChatBot::ChatBot()
 {
+
+    std::cout << "ChatBot Default Constructor" << std::endl;
+
     // invalidate data handles
     _image = nullptr;
     _chatLogic = nullptr;
@@ -21,13 +24,14 @@ ChatBot::ChatBot()
 ChatBot::ChatBot(std::string filename)
 {
     std::cout << "ChatBot Constructor" << std::endl;
-    
+
     // invalidate data handles
     _chatLogic = nullptr;
     _rootNode = nullptr;
 
     // load image into heap memory
     _image = new wxBitmap(filename, wxBITMAP_TYPE_PNG);
+    _imageFilename = filename;
 }
 
 ChatBot::~ChatBot()
@@ -35,7 +39,7 @@ ChatBot::~ChatBot()
     std::cout << "ChatBot Destructor" << std::endl;
 
     // deallocate heap memory
-    if(_image != NULL) // Attention: wxWidgets used NULL and not nullptr
+    if (_image != NULL) // Attention: wxWidgets used NULL and not nullptr
     {
         delete _image;
         _image = NULL;
@@ -44,6 +48,38 @@ ChatBot::~ChatBot()
 
 //// STUDENT CODE
 ////
+// copy constructor
+ChatBot::ChatBot(const ChatBot &other)
+    : _imageFilename(other._imageFilename), _image(new wxBitmap(_imageFilename, wxBITMAP_TYPE_PNG))
+{
+    std::cout << "ChatBot Copy Constructor" << std::endl;
+
+    // load image into heap memory
+    // _imageFilename = other._imageFilename;
+    // _image = new wxBitmap(_imageFilename, wxBITMAP_TYPE_PNG);
+}
+
+// move constructor
+ChatBot::ChatBot(ChatBot &&other) noexcept
+    : _image(other._image), _imageFilename(other._imageFilename)
+{
+    std::cout << "ChatBot Move Constructor" << std::endl;
+    other._image = nullptr;
+}
+
+// copy assignment
+ChatBot &ChatBot::operator=(const ChatBot &other)
+{
+    std::cout << "ChatBot Copy Assignment" << std::endl;
+    return *this = ChatBot(other);
+}
+
+// move assignment
+ChatBot &ChatBot::operator=(ChatBot &&other) noexcept
+{
+    std::cout << "ChatBot Move Assignment" << std::endl;
+    return *this = ChatBot(other);
+}
 
 ////
 //// EOF STUDENT CODE
@@ -69,7 +105,8 @@ void ChatBot::ReceiveMessageFromUser(std::string message)
     if (levDists.size() > 0)
     {
         // sort in ascending order of Levenshtein distance (best fit is at the top)
-        std::sort(levDists.begin(), levDists.end(), [](const EdgeDist &a, const EdgeDist &b) { return a.second < b.second; });
+        std::sort(levDists.begin(), levDists.end(), [](const EdgeDist &a, const EdgeDist &b)
+                  { return a.second < b.second; });
         newNode = levDists.at(0).first->GetChildNode(); // after sorting the best edge is at first position
     }
     else
