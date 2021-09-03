@@ -5,6 +5,7 @@
 #include <string>
 #include "chatgui.h"
 #include <memory>
+#include "graphnode.h"
 
 // forward declarations
 class ChatBot;
@@ -18,16 +19,23 @@ private:
     ////
 
     // data handles (owned)
-    std::vector<std::shared_ptr<GraphNode>> _nodes;
-    // std::vector<std::shared_ptr<GraphEdge>> _edges;
+    std::vector<std::unique_ptr<GraphNode>> _nodes;
+
+    // I don't think we need a vector of edges here.
+    // Because the moment we create an edge object in LoadAnswerGraphFromFile(), 
+    // we can transfer the ownership immediately to the node without putting 
+    // it into a vector first; Even if in the future the "product manager" (if any)
+    // wants the chatlogic to modify edges, still this logic should be based on 
+    // nodes(for example, GraphNode.deleteEdge(GraphoNode _toNode), and ChatLogic call
+    // this method on a specific node).  
 
     ////
     //// EOF STUDENT CODE
 
     // data handles (not owned)
-    GraphNode *_currentNode;
-    ChatBot *_chatBot;
-    ChatBotPanelDialog *_panelDialog;
+    GraphNode *_currentNode{nullptr};
+    ChatBot *_chatBot{nullptr};
+    ChatBotPanelDialog *_panelDialog{nullptr};
 
     // proprietary type definitions
     typedef std::vector<std::pair<std::string, std::string>> tokenlist;
@@ -38,8 +46,8 @@ private:
 
 public:
     // constructor / destructor
-    ChatLogic();
-    ~ChatLogic();
+    ChatLogic(){};
+    ~ChatLogic(){};
 
     // getter / setter
     void SetPanelDialogHandle(ChatBotPanelDialog *panelDialog);
