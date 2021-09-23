@@ -29,15 +29,13 @@ void GraphNode::AddEdgeToChildNode(std::unique_ptr<GraphEdge> edge)
 ////
 void GraphNode::MoveChatbotHere(ChatBot chatbot)
 {
-    _chatBot = ChatBot(std::move(chatbot));
+    _chatBot = std::move(chatbot);
     _chatBot.SetCurrentNode(this);
-    // Isn't making chatbot a unique_ptr passed through every node a better implementation?
-    // Since no ChatBot is constructed or moved, which would reduce the time and space cost. 
 }
 
 void GraphNode::MoveChatbotToNewNode(GraphNode *newNode)
 {
-    newNode->MoveChatbotHere(_chatBot);
+    newNode->MoveChatbotHere(std::move(_chatBot));
 }
 ////
 //// EOF STUDENT CODE
